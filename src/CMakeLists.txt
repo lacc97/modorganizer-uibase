@@ -11,7 +11,8 @@ endif()
 
 
 SET(uibase_SRCS
-    utility.cpp
+    $<$<PLATFORM_ID:Windows>:utility.cpp>
+    $<$<PLATFORM_ID:Linux>:utility_linux.cpp>
     textviewer.cpp
     finddialog.cpp
     report.cpp

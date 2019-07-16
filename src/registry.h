@@ -19,11 +19,17 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #define REGISTRY_H
 
 #include "dllimport.h"
-#include <Windows.h>
+#if defined(WIN32)
+#   include <Windows.h>
+#endif
 
 namespace MOBase {
 
+#if defined(WIN32)
 QDLLEXPORT bool WriteRegistryValue(LPCWSTR appName, LPCWSTR keyName, LPCWSTR value, LPCWSTR fileName);
+#else
+QDLLEXPORT bool WriteRegistryValue(const wchar_t* appName, const wchar_t* keyName, const wchar_t* value, const wchar_t* fileName);
+#endif
 
 } // namespace MOBase
 

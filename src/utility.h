@@ -36,12 +36,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-#include <Windows.h>
+#if defined(WIN32)
+#   include <Windows.h>
+#endif
 
 
 namespace MOBase {
 
+#if defined(WIN32)
 QDLLEXPORT QString windowsErrorString(DWORD errorCode);
+#endif
 
 /**
  * @brief remove the specified directory including all sub-directories
@@ -194,7 +198,11 @@ namespace shell
    *  @param params optional parameters to pass
    *  @return false if something went wrong
    **/
+#if defined(WIN32)
   QDLLEXPORT bool Execute(const QString& program, const QString& params={});
+#else
+  QDLLEXPORT bool Execute(const QString& program, const QStringList& params={});
+#endif
 }
 
 /**
@@ -334,6 +342,7 @@ QDLLEXPORT QString ToQString(const std::string &source);
  **/
 QDLLEXPORT QString ToQString(const std::wstring &source);
 
+#if defined(WIN32)
 /**
  * @brief convert a systemtime object to a string containing date and time in local representation
  *
@@ -341,6 +350,7 @@ QDLLEXPORT QString ToQString(const std::wstring &source);
  * @return string representation of the time object
  **/
 QDLLEXPORT QString ToString(const SYSTEMTIME &time);
+#endif
 
 /**
  * throws on failure
@@ -390,8 +400,13 @@ bool isOneOf(const T &val, const std::initializer_list<T> &list) {
   return std::find(list.begin(), list.end(), val) != list.end();
 }
 
+#if defined(WIN32)
 QDLLEXPORT std::wstring formatSystemMessage(DWORD id);
 QDLLEXPORT QString formatSystemMessageQ(DWORD id);
+#else
+QDLLEXPORT std::wstring formatSystemMessage(std::errc id);
+QDLLEXPORT QString formatSystemMessageQ(std::errc id);
+#endif
 
 } // namespace MOBase
 

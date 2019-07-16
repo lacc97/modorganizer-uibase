@@ -6,8 +6,10 @@
 #include <QTimer>
 #include <QTime>
 #include <map>
-#include <Windows.h>
-#include <shobjidl.h>
+#if defined(WIN32)
+#   include <Windows.h>
+#   include <shobjidl.h>
+#endif
 #include "dllimport.h"
 
 namespace MOBase {
@@ -41,9 +43,11 @@ private:
   QTimer m_CreateTimer;
   int m_CreateTries;
 
+#if defined(WIN32)
   HWND m_WinId;
 
   ITaskbarList3 *m_Taskbar;
+#endif
 };
 
 }

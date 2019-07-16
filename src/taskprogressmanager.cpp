@@ -2,7 +2,9 @@
 #include <QApplication>
 #include <QWidget>
 #include <QMainWindow>
-#include "comdef.h"
+#if defined(WIN32)
+#   include "comdef.h"
+#endif
 
 namespace MOBase {
 
@@ -14,6 +16,7 @@ TaskProgressManager &TaskProgressManager::instance()
 
 void TaskProgressManager::forgetMe(quint32 id)
 {
+#if defined(WIN32)
   if (m_Taskbar == nullptr) {
     return;
   }
@@ -22,10 +25,12 @@ void TaskProgressManager::forgetMe(quint32 id)
     m_Percentages.erase(iter);
   }
   showProgress();
+#endif
 }
 
 void TaskProgressManager::updateProgress(quint32 id, qint64 value, qint64 max)
 {
+#if defined(WIN32)
   QMutexLocker lock(&m_Mutex);
   if (m_Taskbar == nullptr) {
     return;
@@ -41,6 +46,7 @@ void TaskProgressManager::updateProgress(quint32 id, qint64 value, qint64 max)
   }
 
   showProgress();
+#endif
 }
 
 quint32 TaskProgressManager::getId()
@@ -53,7 +59,9 @@ quint32 TaskProgressManager::getId()
 void TaskProgressManager::showProgress()
 {
   if (!m_Percentages.empty()) {
+#if defined(WIN32)
     m_Taskbar->SetProgressState(m_WinId, TBPF_NORMAL);
+#endif
 
     QTime now = QTime::currentTime();
     qint64 total = 0;
@@ -71,15 +79,20 @@ void TaskProgressManager::showProgress()
       }
     }
 
+#if defined(WIN32)
     m_Taskbar->SetProgressValue(m_WinId, total, count * 100);
+#endif
   } else {
+#if defined(WIN32)
     m_Taskbar->SetProgressState(m_WinId, TBPF_NOPROGRESS);
+#endif
   }
 }
 
 
 bool TaskProgressManager::tryCreateTaskbar()
 {
+#if defined(WIN32)
   // try to find our main window
   for (QWidget *widget : QApplication::topLevelWidgets()) {
     QMainWindow *mainWin = qobject_cast<QMainWindow*>(widget);
@@ -108,11 +121,16 @@ bool TaskProgressManager::tryCreateTaskbar()
     qWarning("failed to create taskbar connection (this is to be expected on "
              "Windows XP): %s", resString.ErrorMessage());
   }
+#endif
   return false;
 }
 
 TaskProgressManager::TaskProgressManager()
+#if defined(WIN32)
   : m_NextId(1), m_CreateTries(10), m_WinId(nullptr), m_Taskbar(nullptr)
+#else
+  : m_NextId(1), m_CreateTries(10)
+#endif
 {
 }
 

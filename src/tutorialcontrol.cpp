@@ -102,6 +102,7 @@ void TutorialControl::expose(const QString &widgetName, QObject *widget)
 
 static QString canonicalPath(const QString &path)
 {
+#if defined(WIN32)
   boost::scoped_array<wchar_t> buffer(new wchar_t[32768]);
   DWORD res = ::GetShortPathNameW((wchar_t*)path.utf16(), buffer.get(), 32768);
   if (res == 0) {
@@ -112,6 +113,9 @@ static QString canonicalPath(const QString &path)
     return path;
   }
   return QString::fromWCharArray(buffer.get());
+#else
+  return QFileInfo(path).canonicalPath();
+#endif
 }
 
 void TutorialControl::startTutorial(const QString &tutorial)

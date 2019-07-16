@@ -23,18 +23,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "utility.h"
 #include <QMessageBox>
 #include <QApplication>
-#include <Windows.h>
+#if defined(WIN32)
+#   include <Windows.h>
+#endif
 
 namespace MOBase {
 
 
 void reportError(const QString &message)
 {
+#if defined(WIN32)
   if (QApplication::topLevelWidgets().count() != 0) {
+#endif
+
     QMessageBox messageBox(QMessageBox::Warning, QObject::tr("Error"), message, QMessageBox::Ok);
     messageBox.exec();
+
+#if defined(WIN32)
   } else {
     ::MessageBoxW(nullptr, message.toStdWString().c_str(), QObject::tr("Error").toStdWString().c_str(), MB_ICONERROR | MB_OK);
   }
+#endif
 }
 } // namespace MOBase
